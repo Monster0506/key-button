@@ -19,6 +19,18 @@
                     <path d="M165.675 45.467C175.026 44.5675 185.116 47.156 197.282 51.1232C232.426 62.5832 267.932 74.4187 307.642 86.6369C312.212 88.0431 315.403 89.8794 317.44 92.1486C318.511 93.341 319.241 94.6327 319.691 96.0011C319.738 96.0238 319.777 96.0473 319.808 96.0734C323.933 99.6423 327.485 108.542 328.746 112.546C333.559 127.417 343.667 158.667 345.593 164.707C347.829 171.722 351.843 177.846 347.437 185.285C347.318 185.578 347.187 185.873 347.042 186.169L346.987 186.005C346.768 186.338 346.534 186.675 346.28 187.013C340.092 195.249 293.679 246.724 273.395 270.745C253.112 294.767 245.626 307.362 209.871 297.41C174.117 287.459 88.3902 254.694 68.1503 244.665C49.7396 235.543 50.9605 229.908 53.7108 219.613C55.9113 211.377 69.9838 160.36 76.745 135.881C76.8387 135.864 76.9324 135.846 77.0263 135.828C77.2577 135.071 77.5382 134.315 77.8554 133.559C78.637 130.76 80.1703 127.902 81.913 124.901C87.4843 115.306 101.154 100.903 107.267 94.9152L112.901 88.7316C117.228 83.8274 124.233 75.8678 138.572 60.5568C147.707 50.8031 156.252 46.3734 165.675 45.467Z" fill="currentColor"/>
                 </svg>
 
+                <div class="lighting-container">
+                    <div class="reflection primary-reflection"></div>
+                    <div class="reflection secondary-reflection-1"></div>
+                    <div class="reflection secondary-reflection-2"></div>
+                    <div class="edge-highlight edge-top"></div>
+                    <div class="edge-highlight edge-left"></div>
+                    <div class="edge-highlight edge-right"></div>
+                    <div class="surface-highlight surface-1"></div>
+                    <div class="surface-highlight surface-2"></div>
+                    <div class="surface-highlight surface-3"></div>
+                </div>
+
                 <img class="cover" src="./assets/cover.svg" alt="image">
 
                 <p class="text">Button</p>
@@ -37,6 +49,22 @@
             <div class="control-group">
                 <label for="text-input">Button Text:</label>
                 <input type="text" id="text-input" value="Button" maxlength="20">
+            </div>
+            
+            <div class="control-group">
+                <label for="light-intensity">Light Intensity:</label>
+                <input type="range" id="light-intensity" min="0" max="100" value="30">
+                <span id="intensity-value">30%</span>
+            </div>
+            <div class="control-group">
+                <label for="reflection-strength">Reflection Strength:</label>
+                <input type="range" id="reflection-strength" min="0" max="100" value="85">
+                <span id="reflection-value">85%</span>
+            </div>
+            <div class="control-group">
+                <label for="metallic-roughness">Metallic Roughness:</label>
+                <input type="range" id="metallic-roughness" min="0" max="100" value="30">
+                <span id="roughness-value">30%</span>
             </div>
             
             <div class="control-group">
@@ -64,6 +92,18 @@
         const textInput = document.getElementById('text-input');
         const buttonText = document.querySelector('.text');
         const presetColors = document.querySelectorAll('.preset-color');
+        const lightIntensitySlider = document.getElementById('light-intensity');
+        const reflectionStrengthSlider = document.getElementById('reflection-strength');
+        const metallicRoughnessSlider = document.getElementById('metallic-roughness');
+        const intensityValue = document.getElementById('intensity-value');
+        const reflectionValue = document.getElementById('reflection-value');
+        const roughnessValue = document.getElementById('roughness-value');
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let lightIntensity = 70;
+        let reflectionStrength = 85;
+        let metallicRoughness = 30;
 
         // Function to update button color
         function updateButtonColor(color) {
@@ -76,6 +116,142 @@
             buttonText.textContent = text;
             textInput.value = text;
         }
+
+        function updateLighting(x, y) {
+            const rect = frame.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const relativeX = (x - centerX) / (rect.width / 2);
+            const relativeY = (y - centerY) / (rect.height / 2);
+            
+            const distance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+            const normalizedDistance = Math.min(distance, 1);
+            
+            const intensity = Math.max(0, 1 - normalizedDistance) * (lightIntensity / 100);
+            
+            const primaryReflection = document.querySelector('.primary-reflection');
+            const primaryX = 50 + relativeX * 25;
+            const primaryY = 50 + relativeY * 25;
+            const primarySize = 30 + (1 - normalizedDistance) * 40;
+            const primaryOpacity = intensity * (reflectionStrength / 100) * 0.8;
+            
+            primaryReflection.style.background = `
+                radial-gradient(
+                    ellipse ${primarySize}% ${primarySize * 0.6}% at ${primaryX}% ${primaryY}%,
+                    rgba(255, 255, 255, ${primaryOpacity}) 0%,
+                    rgba(255, 255, 255, ${primaryOpacity * 0.6}) 30%,
+                    rgba(255, 255, 255, ${primaryOpacity * 0.2}) 60%,
+                    transparent 100%
+                )
+            `;
+            
+            const secondary1 = document.querySelector('.secondary-reflection-1');
+            const secondary2 = document.querySelector('.secondary-reflection-2');
+            
+            const sec1X = 50 + relativeX * 15;
+            const sec1Y = 50 + relativeY * 15;
+            const sec2X = 50 + relativeX * 35;
+            const sec2Y = 50 + relativeY * 35;
+            
+            secondary1.style.background = `
+                radial-gradient(
+                    ellipse 20% 12% at ${sec1X}% ${sec1Y}%,
+                    rgba(255, 255, 255, ${intensity * 0.4}) 0%,
+                    rgba(255, 255, 255, ${intensity * 0.2}) 50%,
+                    transparent 100%
+                )
+            `;
+            
+            secondary2.style.background = `
+                radial-gradient(
+                    ellipse 15% 9% at ${sec2X}% ${sec2Y}%,
+                    rgba(255, 255, 255, ${intensity * 0.3}) 0%,
+                    rgba(255, 255, 255, ${intensity * 0.1}) 50%,
+                    transparent 100%
+                )
+            `;
+            
+            const edgeTop = document.querySelector('.edge-top');
+            const edgeLeft = document.querySelector('.edge-left');
+            const edgeRight = document.querySelector('.edge-right');
+            
+            const edgeIntensity = intensity * 0.6;
+            
+            edgeTop.style.background = `
+                linear-gradient(
+                    to bottom,
+                    rgba(255, 255, 255, ${edgeIntensity * (1 - Math.abs(relativeY))}) 0%,
+                    transparent 100%
+                )
+            `;
+            
+            edgeLeft.style.background = `
+                linear-gradient(
+                    to right,
+                    rgba(255, 255, 255, ${edgeIntensity * (1 - Math.abs(relativeX))}) 0%,
+                    transparent 100%
+                )
+            `;
+            
+            edgeRight.style.background = `
+                linear-gradient(
+                    to left,
+                    rgba(255, 255, 255, ${edgeIntensity * (1 - Math.abs(relativeX))}) 0%,
+                    transparent 100%
+                )
+            `;
+            
+            const surface1 = document.querySelector('.surface-1');
+            const surface2 = document.querySelector('.surface-2');
+            const surface3 = document.querySelector('.surface-3');
+            
+            const roughness = metallicRoughness / 100;
+            const surfaceIntensity = intensity * (1 - roughness * 0.5);
+            
+            const surf1X = 50 + relativeX * (20 - roughness * 10);
+            const surf1Y = 50 + relativeY * (20 - roughness * 10);
+            const surf2X = 50 + relativeX * (30 + roughness * 10);
+            const surf2Y = 50 + relativeY * (30 + roughness * 10);
+            const surf3X = 50 + relativeX * (40 + roughness * 15);
+            const surf3Y = 50 + relativeY * (40 + roughness * 15);
+            
+            surface1.style.background = `
+                radial-gradient(
+                    ellipse ${15 - roughness * 8}% ${(15 - roughness * 8) * 0.6}% at ${surf1X}% ${surf1Y}%,
+                    rgba(255, 255, 255, ${surfaceIntensity * 0.5}) 0%,
+                    rgba(255, 255, 255, ${surfaceIntensity * 0.2}) 50%,
+                    transparent 100%
+                )
+            `;
+            
+            surface2.style.background = `
+                radial-gradient(
+                    ellipse ${12 - roughness * 6}% ${(12 - roughness * 6) * 0.6}% at ${surf2X}% ${surf2Y}%,
+                    rgba(255, 255, 255, ${surfaceIntensity * 0.4}) 0%,
+                    rgba(255, 255, 255, ${surfaceIntensity * 0.15}) 50%,
+                    transparent 100%
+                )
+            `;
+            
+            surface3.style.background = `
+                radial-gradient(
+                    ellipse ${10 - roughness * 5}% ${(10 - roughness * 5) * 0.6}% at ${surf3X}% ${surf3Y}%,
+                    rgba(255, 255, 255, ${surfaceIntensity * 0.3}) 0%,
+                    rgba(255, 255, 255, ${surfaceIntensity * 0.1}) 50%,
+                    transparent 100%
+                )
+            `;
+            
+            const brightness = 1 + intensity * 0.2;
+            frame.style.setProperty('--brightness', brightness);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            updateLighting(mouseX, mouseY);
+        });
 
         // Color picker event listener
         colorPicker.addEventListener('input', (e) => {
@@ -95,9 +271,28 @@
             });
         });
 
+        lightIntensitySlider.addEventListener('input', (e) => {
+            lightIntensity = parseInt(e.target.value);
+            intensityValue.textContent = lightIntensity + '%';
+            updateLighting(mouseX, mouseY);
+        });
+
+        reflectionStrengthSlider.addEventListener('input', (e) => {
+            reflectionStrength = parseInt(e.target.value);
+            reflectionValue.textContent = reflectionStrength + '%';
+            updateLighting(mouseX, mouseY);
+        });
+
+        metallicRoughnessSlider.addEventListener('input', (e) => {
+            metallicRoughness = parseInt(e.target.value);
+            roughnessValue.textContent = metallicRoughness + '%';
+            updateLighting(mouseX, mouseY);
+        });
+
         // Initialize with default values
         updateButtonColor('#000000');
         updateButtonText('Button');
+        updateLighting(window.innerWidth / 2, window.innerHeight / 2);
     </script>
 </body>
 </html>
