@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Pressable Button</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main>
+        <div class="container" style="width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center;">
+
+            <div class="frame">
+
+                <img class="base" src="./assets/base.svg" alt="image">
+                <img class="button" src="./assets/button.svg" alt="image">
+                
+                <svg class="recolor-overlay" width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M165.675 45.467C175.026 44.5675 185.116 47.156 197.282 51.1232C232.426 62.5832 267.932 74.4187 307.642 86.6369C312.212 88.0431 315.403 89.8794 317.44 92.1486C318.511 93.341 319.241 94.6327 319.691 96.0011C319.738 96.0238 319.777 96.0473 319.808 96.0734C323.933 99.6423 327.485 108.542 328.746 112.546C333.559 127.417 343.667 158.667 345.593 164.707C347.829 171.722 351.843 177.846 347.437 185.285C347.318 185.578 347.187 185.873 347.042 186.169L346.987 186.005C346.768 186.338 346.534 186.675 346.28 187.013C340.092 195.249 293.679 246.724 273.395 270.745C253.112 294.767 245.626 307.362 209.871 297.41C174.117 287.459 88.3902 254.694 68.1503 244.665C49.7396 235.543 50.9605 229.908 53.7108 219.613C55.9113 211.377 69.9838 160.36 76.745 135.881C76.8387 135.864 76.9324 135.846 77.0263 135.828C77.2577 135.071 77.5382 134.315 77.8554 133.559C78.637 130.76 80.1703 127.902 81.913 124.901C87.4843 115.306 101.154 100.903 107.267 94.9152L112.901 88.7316C117.228 83.8274 124.233 75.8678 138.572 60.5568C147.707 50.8031 156.252 46.3734 165.675 45.467Z" fill="currentColor"/>
+                </svg>
+
+                <img class="cover" src="./assets/cover.svg" alt="image">
+
+                <p class="text">Button</p>
+
+            </div>
+
+        </div>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <div class="control-group">
+                <label for="color-picker">Button Color:</label>
+                <input type="color" id="color-picker" value="#000000">
+            </div>
+            
+            <div class="control-group">
+                <label for="text-input">Button Text:</label>
+                <input type="text" id="text-input" value="Button" maxlength="20">
+            </div>
+            
+            <div class="control-group">
+                <label for="preset-colors">Preset Colors:</label>
+                <div class="preset-colors">
+                    <button class="preset-color" data-color="#000000" style="background-color: #000000;" title="Black"></button>
+                    <button class="preset-color" data-color="#ff0000" style="background-color: #ff0000;" title="Red"></button>
+                    <button class="preset-color" data-color="#00ff00" style="background-color: #00ff00;" title="Green"></button>
+                    <button class="preset-color" data-color="#0000ff" style="background-color: #0000ff;" title="Blue"></button>
+                    <button class="preset-color" data-color="#ffff00" style="background-color: #ffff00;" title="Yellow"></button>
+                    <button class="preset-color" data-color="#ff00ff" style="background-color: #ff00ff;" title="Magenta"></button>
+                    <button class="preset-color" data-color="#00ffff" style="background-color: #00ffff;" title="Cyan"></button>
+                    <button class="preset-color" data-color="#ff8000" style="background-color: #ff8000;" title="Orange"></button>
+                    <button class="preset-color" data-color="#8000ff" style="background-color: #8000ff;" title="Purple"></button>
+                    <button class="preset-color" data-color="#808080" style="background-color: #808080;" title="Gray"></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Get references to elements
+        const frame = document.querySelector('.frame');
+        const colorPicker = document.getElementById('color-picker');
+        const textInput = document.getElementById('text-input');
+        const buttonText = document.querySelector('.text');
+        const presetColors = document.querySelectorAll('.preset-color');
+
+        // Function to update button color
+        function updateButtonColor(color) {
+            frame.style.setProperty('--color', color);
+            colorPicker.value = color;
+        }
+
+        // Function to update button text
+        function updateButtonText(text) {
+            buttonText.textContent = text;
+            textInput.value = text;
+        }
+
+        // Color picker event listener
+        colorPicker.addEventListener('input', (e) => {
+            updateButtonColor(e.target.value);
+        });
+
+        // Text input event listener
+        textInput.addEventListener('input', (e) => {
+            updateButtonText(e.target.value);
+        });
+
+        // Preset color buttons event listeners
+        presetColors.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const color = e.target.dataset.color;
+                updateButtonColor(color);
+            });
+        });
+
+        // Initialize with default values
+        updateButtonColor('#000000');
+        updateButtonText('Button');
+    </script>
+</body>
+</html>
